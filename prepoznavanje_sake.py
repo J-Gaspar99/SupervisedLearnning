@@ -109,12 +109,56 @@ podeljeno = nazivi_slika['Nazivi slika'].str.split('_', expand=True)
 podeljeno.drop([0, 3], axis=1, inplace=True)
 podeljeno.columns = ['skup', 'klasa', 'id_slike']
 
+y = podeljeno.loc[:, 'klasa']
+klase = podeljeno.loc[:, 'klasa'].unique()
+
+groupped = podeljeno.groupby('skup').count()
+raspodela_po_klasama = groupped['klasa']
+
+#%%
+validacioni_skup_x = x.loc[:raspodela_po_klasama[0]-1, :]
+validacioni_skup_y = y[:raspodela_po_klasama[0]]
+
+trening_skup_x = x.loc[raspodela_po_klasama[0]:, :]
+trening_skup_y = y[raspodela_po_klasama[0]:]
+
 
 #%%
 #Neuralna mreza
+acc = []
+fin_conf_mat = np.zeros((len(klase), len(klase)))
 
+for i, r in enumerate(raspodela_po_klasama[1:7]):
+    
+    x_test = x.loc[(i+1)*r:(i+2)*r-1, :]
+    y_test = y.loc[(i+1)*r:(i+2)*r-1]
+    
+    x_train = x.loc[(i+2)*r-1:, :]
+    y_train = y.loc[(i+1)*r:(i+2)*r-1]
+    
+#     classifier = MLPClassifier(hidden_layer_sizes=(32,32,32), activation='tanh',
+#                               solver='adam', batch_size=50, learning_rate='constant', 
+#                               learning_rate_init=0.001, max_iter=50, shuffle=True,
+#                               random_state=42, early_stopping=True, n_iter_no_change=10,
+#                               validation_fraction=0.1, verbose=False)
+    
+#     classifier.fit(x_train.values, y_train)
+#     y_pred = classifier.predict(X_train.iloc[test_index, :].values)
+#     plt.figure
+#     plt.plot(classifier.validation_scores_)
+#     #plt.plot(classifier.loss_curve_)
+#     plt.show()
+#     print(accuracy_score(y_train.iloc[test_index], y_pred))
+#     fin_conf_mat += confusion_matrix(y_train.iloc[test_index], y_pred)
 
+# #print('konacna matrica konfuzije: \n', fin_conf_mat)
+# print('klase:', classifier.classes_)
+# disp = ConfusionMatrixDisplay(confusion_matrix=fin_conf_mat,  display_labels=classifier.classes_)
+# fig, ax = plt.subplots(figsize=(10,10))
+# disp.plot(cmap="Blues", values_format='', xticks_rotation='vertical', ax=ax)
+# plt.show()
 
+# print('procenat tacno predvidjenih: ', sum(np.diag(fin_conf_mat))/sum(sum(fin_conf_mat)))
 
 
 #%%
